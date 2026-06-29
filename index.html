@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>사진관 이름 — 빛이 머무는 순간을 담습니다</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" as="style" crossorigin
+  href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  /* ================================
+     0. 토큰 (색상 / 타이포 / 레이아웃)
+     ================================ */
+  :root {
+    --c-ink: #15140F;
+    --c-paper: #F6F5F1;
+    --c-paper-dim: #ECE9E1;
+    --c-forest: #2F6F4E;
+    --c-forest-deep: #1F4D35;
+    --c-film: #8A8170;
+    --c-amber: #C98A3D;
+    --c-line: #DAD7CC;
+    --c-line-on-dark: rgba(246,245,241,0.18);
+
+    --font-display: 'Noto Serif KR', serif;
+    --font-body: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', sans-serif;
+
+    --max-w: 1180px;
+    --section-pad: clamp(64px, 10vw, 120px);
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    margin: 0;
+    background: var(--c-paper);
+    color: var(--c-ink);
+    font-family: var(--font-body);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  img { max-width: 100%; display: block; }
+
+  a { color: inherit; text-decoration: none; }
+
+  .wrap {
+    max-width: var(--max-w);
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--c-forest);
+  }
+
+  .eyebrow::before {
+    content: '';
+    width: 14px;
+    height: 1px;
+    background: var(--c-forest);
+  }
+
+  /* EXIF 스타일 시그니처 태그 — 사진의 메타데이터를 모티프로 한 장치 */
+  .exif-tag {
+    font-family: var(--font-body);
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    font-variant-numeric: tabular-nums;
+    color: var(--c-amber);
+    white-space: nowrap;
+  }
+
+  .section-head {
+    margin-bottom: 40px;
+  }
+
+  .section-head h2 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(26px, 3.4vw, 38px);
+    margin: 10px 0 0;
+    letter-spacing: -0.01em;
+  }
+
+  .section-head p {
+    margin: 10px 0 0;
+    color: var(--c-film);
+    font-size: 15px;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 28px;
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+
+  .btn:hover { transform: translateY(-1px); }
+
+  .btn-primary {
+    background: var(--c-forest);
+    color: #fff;
+  }
+  .btn-primary:hover { opacity: 0.92; }
+
+  .btn-outline {
+    background: transparent;
+    border-color: var(--c-line);
+    color: var(--c-ink);
+  }
+  .btn-outline:hover { border-color: var(--c-forest); color: var(--c-forest); }
+
+  .btn-ghost-light {
+    background: transparent;
+    border-color: var(--c-line-on-dark);
+    color: #fff;
+  }
+  .btn-ghost-light:hover { border-color: #fff; }
+
+  /* 스크롤 reveal */
+  .reveal {
+    opacity: 0;
+    transform: translateY(18px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .reveal { opacity: 1; transform: none; transition: none; }
+  }
+
+  /* ================================
+     1. 헤더
+     ================================ */
+  .site-header {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 22px 0;
+    transition: background 0.3s ease, padding 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .site-header .wrap {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .site-header.is-scrolled {
+    background: rgba(246,245,241,0.92);
+    backdrop-filter: blur(6px);
+    padding: 14px 0;
+    box-shadow: 0 1px 0 var(--c-line);
+  }
+
+  .logo {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 19px;
+    letter-spacing: -0.01em;
+    color: var(--c-ink);
+  }
+  .site-header.is-scrolled .logo,
+  .site-header.is-scrolled .nav-link { color: var(--c-ink); }
+  .site-header:not(.is-scrolled) .logo,
+  .site-header:not(.is-scrolled) .nav-link { color: #fff; }
+
+  .nav-list {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    list-style: none;
+    margin: 0; padding: 0;
+  }
+
+  .nav-link {
+    font-size: 14px;
+    font-weight: 500;
+    position: relative;
+    transition: color 0.2s ease;
+  }
+  .nav-link::after {
+    content: '';
+    position: absolute;
+    left: 0; bottom: -6px;
+    width: 0; height: 1px;
+    background: currentColor;
+    transition: width 0.2s ease;
+  }
+  .nav-link:hover::after { width: 100%; }
+
+  .nav-link.is-cta {
+    padding: 9px 18px;
+    border-radius: 999px;
+    background: var(--c-forest);
+    color: #fff !important;
+  }
+  .nav-link.is-cta::after { display: none; }
+
+  .nav-toggle {
+    display: none;
+    width: 32px; height: 24px;
+    position: relative;
+    background: none;
+    border: none;
+    cursor: pointer;
+    z-index: 110;
+  }
+  .nav-toggle span {
+    position: absolute;
+    left: 0; right: 0;
+    height: 2px;
+    background: var(--c-ink);
+    transition: transform 0.25s ease, opacity 0.25s ease;
+  }
+  .site-header:not(.is-scrolled) .nav-toggle span { background: #fff; }
+  .nav-toggle span:nth-child(1) { top: 4px; }
+  .nav-toggle span:nth-child(2) { top: 12px; }
+  .nav-toggle span:nth-child(3) { top: 20px; }
+
+  .nav-open .nav-toggle span { background: var(--c-ink) !important; }
+  .nav-open .nav-toggle span:nth-child(1) { transform: translateY(8px) rotate(45deg); }
+  .nav-open .nav-toggle span:nth-child(2) { opacity: 0; }
+  .nav-open .nav-toggle span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
+
+  @media (max-width: 860px) {
+    .nav-toggle { display: block; }
+    .nav-list {
+      position: fixed;
+      top: 0; right: 0;
+      height: 100vh;
+      width: min(78vw, 320px);
+      background: var(--c-paper);
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: center;
+      gap: 28px;
+      padding: 0 40px;
+      transform: translateX(100%);
+      transition: transform 0.3s ease;
+    }
+    .nav-open .nav-list { transform: translateX(0); }
+    .nav-list .nav-link { color: var(--c-ink) !important; font-size: 16px; }
+  }
+
+  /* ================================
+     2. 히어로
+     ================================ */
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 0 0 90px;
+    background:
+      linear-gradient(180deg, rgba(21,20,15,0.25) 0%, rgba(21,20,15,0.55) 100%),
+      radial-gradient(120% 90% at 80% 10%, #2c3a30 0%, #1c241d 45%, #15140F 100%);
+    color: #fff;
+    overflow: hidden;
+  }
+
+  /* 실제 대표 사진으로 교체하려면 위 background를 지우고 아래처럼 사용하세요:
+     background: linear-gradient(180deg, rgba(21,20,15,0.15) 0%, rgba(21,20,15,0.6) 100%),
+                 url('실제경로/대표사진.jpg') center / cover no-repeat; */
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px);
+    background-size: 3px 3px;
+    opacity: 0.4;
+    pointer-events: none;
+  }
+
+  .hero-exif {
+    position: absolute;
+    top: 100px;
+    right: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+    color: rgba(255,255,255,0.55);
+  }
+
+  .hero-exif .exif-tag { color: var(--c-amber); }
+
+  .hero-content {
+    position: relative;
+    z-index: 2;
+  }
+
+  .hero-content .eyebrow { color: rgba(255,255,255,0.75); }
+  .hero-content .eyebrow::before { background: rgba(255,255,255,0.75); }
+
+  .hero h1 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(40px, 7vw, 76px);
+    line-height: 1.15;
+    margin: 18px 0 0;
+    letter-spacing: -0.01em;
+    max-width: 12ch;
+  }
+
+  .hero-sub {
+    margin: 22px 0 32px;
+    font-size: 16px;
+    color: rgba(255,255,255,0.8);
+    max-width: 40ch;
+  }
+
+  .scroll-cue {
+    position: absolute;
+    bottom: 28px;
+    left: 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    color: rgba(255,255,255,0.6);
+  }
+
+  .scroll-cue .line {
+    width: 1px; height: 36px;
+    background: rgba(255,255,255,0.4);
+    position: relative;
+    overflow: hidden;
+  }
+  .scroll-cue .line::after {
+    content: '';
+    position: absolute;
+    top: -100%; left: 0; right: 0; height: 50%;
+    background: #fff;
+    animation: scrollLine 1.8s ease-in-out infinite;
+  }
+  @keyframes scrollLine {
+    0% { top: -100%; }
+    60% { top: 100%; }
+    100% { top: 100%; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .scroll-cue .line::after { animation: none; top: 50%; }
+  }
+
+  /* ================================
+     3. 프로모션 배너
+     ================================ */
+  .promo-bar {
+    background: var(--c-forest);
+    color: #fff;
+  }
+  .promo-bar .wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 14px 24px;
+    font-size: 14px;
+    text-align: center;
+    flex-wrap: wrap;
+  }
+  .promo-bar strong { font-weight: 700; }
+  .promo-bar a {
+    text-underline-offset: 3px;
+    text-decoration: underline;
+    flex-shrink: 0;
+  }
+
+  /* ================================
+     4. 작가 소개 티저
+     ================================ */
+  .about-teaser {
+    padding: var(--section-pad) 0;
+  }
+  .about-teaser .wrap {
+    display: grid;
+    grid-template-columns: 0.85fr 1fr;
+    gap: 64px;
+    align-items: center;
+  }
+  .about-photo {
+    aspect-ratio: 4 / 5;
+    border-radius: 4px;
+    background: linear-gradient(150deg, #3a4a3d, #1c241d 60%, #15140F);
+    position: relative;
+    overflow: hidden;
+  }
+  /* 실제 작가 사진으로 교체: .about-photo { background: url('실제경로/작가사진.jpg') center / cover; } */
+  .about-photo .exif-tag {
+    position: absolute;
+    left: 16px; bottom: 16px;
+    color: rgba(255,255,255,0.7);
+  }
+  .about-copy h2 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(26px, 3.2vw, 34px);
+    margin: 12px 0 18px;
+  }
+  .about-copy p {
+    color: var(--c-film);
+    font-size: 15px;
+    max-width: 46ch;
+    margin: 0 0 24px;
+  }
+
+  @media (max-width: 760px) {
+    .about-teaser .wrap { grid-template-columns: 1fr; gap: 32px; }
+  }
+
+  /* ================================
+     5. 포트폴리오
+     ================================ */
+  .portfolio {
+    padding: var(--section-pad) 0;
+    background: var(--c-paper-dim);
+  }
+  .portfolio-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-auto-rows: 180px;
+    gap: 10px;
+  }
+  .portfolio-tile {
+    position: relative;
+    overflow: hidden;
+    border-radius: 3px;
+    background: linear-gradient(160deg, #3d4a3f, #20281f 55%, #15140F);
+  }
+  .portfolio-tile:nth-child(1) { grid-column: span 2; grid-row: span 2; }
+  .portfolio-tile:nth-child(4) { grid-column: span 2; }
+  .portfolio-tile:nth-child(5) { grid-column: span 2; }
+  .portfolio-tile:nth-child(2) { background: linear-gradient(160deg, #4a4233, #241f17 55%, #15140F); }
+  .portfolio-tile:nth-child(3) { background: linear-gradient(160deg, #36404a, #1b2026 55%, #15140F); }
+  .portfolio-tile:nth-child(6) { background: linear-gradient(160deg, #4a3636, #251a1a 55%, #15140F); }
+  .portfolio-tile:nth-child(7) { background: linear-gradient(160deg, #3d4a46, #1d2622 55%, #15140F); }
+
+  /* 실제 작업물 사진으로 교체:
+     .portfolio-tile { background: url('실제경로/사진1.jpg') center / cover; } */
+
+  .portfolio-tile .overlay {
+    position: absolute; inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 14px;
+    background: linear-gradient(180deg, transparent 50%, rgba(0,0,0,0.55) 100%);
+    opacity: 0;
+    transition: opacity 0.25s ease;
+  }
+  .portfolio-tile:hover .overlay { opacity: 1; }
+  .portfolio-tile .overlay .exif-tag { color: rgba(255,255,255,0.85); }
+
+  .portfolio-foot {
+    margin-top: 36px;
+    text-align: center;
+  }
+
+  @media (max-width: 760px) {
+    .portfolio-grid { grid-template-columns: repeat(2, 1fr); grid-auto-rows: 150px; }
+    .portfolio-tile:nth-child(1) { grid-column: span 2; grid-row: span 2; }
+    .portfolio-tile:nth-child(4),
+    .portfolio-tile:nth-child(5) { grid-column: span 1; }
+  }
+
+  /* ================================
+     6. 후기 / 리뷰 캐러셀
+     ================================ */
+  .reviews { padding: var(--section-pad) 0; }
+  .review-track-wrap { overflow: hidden; }
+  .review-track {
+    display: flex;
+    gap: 20px;
+    transition: transform 0.4s ease;
+  }
+  .review-card {
+    flex: 0 0 calc((100% - 40px) / 3);
+    background: #fff;
+    border: 1px solid var(--c-line);
+    border-radius: 8px;
+    padding: 28px;
+  }
+  .review-stars { color: var(--c-amber); font-size: 14px; letter-spacing: 2px; }
+  .review-quote {
+    margin: 14px 0 20px;
+    font-size: 14.5px;
+    line-height: 1.7;
+    color: var(--c-ink);
+  }
+  .review-author {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    color: var(--c-film);
+  }
+  .review-author .dot {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--c-paper-dim);
+    border: 1px solid var(--c-line);
+  }
+
+  .review-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    margin-top: 32px;
+  }
+  .review-arrow {
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    border: 1px solid var(--c-line);
+    background: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color 0.2s ease;
+  }
+  .review-arrow:hover { border-color: var(--c-forest); }
+  .review-dots { display: flex; gap: 8px; }
+  .review-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--c-line);
+    cursor: pointer;
+    transition: background 0.2s ease, width 0.2s ease;
+  }
+  .review-dot.is-active { background: var(--c-forest); width: 18px; border-radius: 4px; }
+
+  @media (max-width: 900px) {
+    .review-card { flex: 0 0 calc(100% - 0px); }
+  }
+
+  /* ================================
+     7. 인스타그램
+     ================================ */
+  .instagram { padding: var(--section-pad) 0; background: var(--c-paper-dim); }
+  .instagram .section-head { display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+  .ig-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+  }
+  .ig-tile {
+    aspect-ratio: 1/1;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(160deg, #404a3d, #1d231d);
+  }
+  .ig-tile:nth-child(odd) { background: linear-gradient(160deg, #4a4435, #221f17); }
+  /* 실제 인스타그램 자동 연동은 SnapWidget, Elfsight 같은 위젯 스크립트를 이 영역에 넣어 대체하세요 */
+  .ig-tile .ig-icon {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(21,20,15,0.35);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+  .ig-tile:hover .ig-icon { opacity: 1; }
+  .ig-icon svg { width: 22px; height: 22px; fill: #fff; }
+
+  @media (max-width: 760px) {
+    .ig-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+
+  /* ================================
+     8. FAQ
+     ================================ */
+  .faq { padding: var(--section-pad) 0; max-width: 760px; margin: 0 auto; }
+  .faq-item {
+    border-bottom: 1px solid var(--c-line);
+  }
+  .faq-q {
+    width: 100%;
+    background: none;
+    border: none;
+    text-align: left;
+    padding: 22px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    font-family: var(--font-body);
+    font-size: 15.5px;
+    font-weight: 600;
+    color: var(--c-ink);
+    cursor: pointer;
+  }
+  .faq-q .plus {
+    flex-shrink: 0;
+    width: 20px; height: 20px;
+    position: relative;
+  }
+  .faq-q .plus::before, .faq-q .plus::after {
+    content: '';
+    position: absolute;
+    background: var(--c-ink);
+    transition: transform 0.25s ease;
+  }
+  .faq-q .plus::before { left: 0; top: 50%; width: 100%; height: 1px; }
+  .faq-q .plus::after { top: 0; left: 50%; width: 1px; height: 100%; }
+  .faq-item.is-open .plus::after { transform: rotate(90deg); }
+
+  .faq-a {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+  }
+  .faq-a p {
+    margin: 0 0 22px;
+    color: var(--c-film);
+    font-size: 14.5px;
+    line-height: 1.7;
+    max-width: 56ch;
+  }
+
+  /* ================================
+     9. 최종 CTA
+     ================================ */
+  .final-cta {
+    background: var(--c-ink);
+    color: #fff;
+    padding: var(--section-pad) 0;
+    text-align: center;
+  }
+  .final-cta .exif-tag { display: block; margin-bottom: 16px; color: var(--c-amber); }
+  .final-cta h2 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(28px, 4vw, 42px);
+    margin: 0 0 14px;
+  }
+  .final-cta p {
+    color: rgba(255,255,255,0.7);
+    margin: 0 0 32px;
+  }
+
+  /* ================================
+     10. 푸터
+     ================================ */
+  .site-footer {
+    background: #100F0B;
+    color: rgba(255,255,255,0.75);
+    padding: 70px 0 28px;
+  }
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1fr 1fr;
+    gap: 40px;
+    padding-bottom: 44px;
+    border-bottom: 1px solid var(--c-line-on-dark);
+  }
+  .footer-logo {
+    font-family: var(--font-display);
+    font-size: 20px;
+    color: #fff;
+    margin-bottom: 12px;
+  }
+  .footer-grid p { font-size: 13.5px; line-height: 1.8; margin: 0; color: rgba(255,255,255,0.55); }
+  .footer-col h4 {
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.45);
+    margin: 0 0 16px;
+  }
+  .footer-col ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+  .footer-col a { font-size: 14px; transition: color 0.2s ease; }
+  .footer-col a:hover { color: var(--c-amber); }
+
+  .footer-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding-top: 24px;
+    font-size: 12.5px;
+    color: rgba(255,255,255,0.4);
+  }
+
+  @media (max-width: 760px) {
+    .footer-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- ===== 헤더 ===== -->
+  <header class="site-header" id="siteHeader">
+    <div class="wrap">
+      <a href="#" class="logo">사진관 이름</a>
+      <button class="nav-toggle" id="navToggle" aria-label="메뉴 열기">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="nav-list" id="navList">
+        <li><a href="about.html" class="nav-link">작가소개</a></li>
+        <li><a href="portfolio.html" class="nav-link">포트폴리오</a></li>
+        <li><a href="pricing.html" class="nav-link">요금안내</a></li>
+        <li><a href="community.html" class="nav-link">커뮤니티</a></li>
+        <li><a href="reservation.html" class="nav-link is-cta">예약하기</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <!-- ===== 히어로 ===== -->
+  <section class="hero">
+    <div class="hero-exif">
+      <span class="exif-tag">F/2.8</span>
+      <span class="exif-tag">1/250s</span>
+      <span class="exif-tag">ISO 100</span>
+      <span class="exif-tag">35mm</span>
+    </div>
+    <div class="wrap hero-content">
+      <span class="eyebrow">PHOTO STUDIO</span>
+      <h1>오늘의 빛을<br>오래 남기는 방법</h1>
+      <p class="hero-sub">스튜디오와 야외, 일상의 모든 순간을 사진으로 기록합니다.</p>
+      <a href="reservation.html" class="btn btn-ghost-light">예약하기 →</a>
+    </div>
+    <div class="scroll-cue">
+      <span class="line"></span>
+      <span>SCROLL</span>
+    </div>
+  </section>
+
+  <!-- ===== 프로모션 배너 ===== -->
+  <div class="promo-bar">
+    <div class="wrap">
+      <span><strong>6월 한정</strong> · 야외 촬영 패키지 15% 할인</span>
+      <a href="reservation.html">지금 예약하기 →</a>
+    </div>
+  </div>
+
+  <!-- ===== 작가 소개 티저 ===== -->
+  <section class="about-teaser">
+    <div class="wrap reveal">
+      <div class="about-photo">
+        <span class="exif-tag">PORTRAIT — 2026</span>
+      </div>
+      <div class="about-copy">
+        <span class="eyebrow">ABOUT</span>
+        <h2>작가 소개</h2>
+        <p>자연광과 담백한 구도를 좋아하는 사진작가입니다. 10년째 인물과 일상의 표정을 기록하고 있습니다. 꾸미지 않은 순간이 가장 오래 남는다고 믿습니다.</p>
+        <a href="about.html" class="btn btn-outline">작가 소개 더 보기 →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 포트폴리오 ===== -->
+  <section class="portfolio" id="portfolio">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <span class="eyebrow">PORTFOLIO</span>
+        <h2>최근 작업물</h2>
+        <p>최근에 담은 순간들 중 일부를 소개합니다.</p>
+      </div>
+      <div class="portfolio-grid reveal">
+        <div class="portfolio-tile"><div class="overlay"><span class="exif-tag">F/1.8 · 1/320s</span></div></div>
+        <div class="portfolio-tile"><div class="overlay"><span class="exif-tag">F/2.0 · 1/200s</span></div></div>
+        <div class="portfolio-tile"><div class="overlay"><span class="exif-tag">F/4.0 · 1/500s</span></div></div>
+        <div class="portfolio-tile"><div class="overlay"><span class="exif-tag">F/2.8 · 1/160s</span></div></div>
+        <div class="portfolio-tile"><div class="overlay"><span class="exif-tag">F/1.4 · 1/400s</span></div></div>
+        <div class="portfolio-tile"><div class="overlay"><span class="exif-tag">F/5.6 · 1/250s</span></div></div>
+        <div class="portfolio-tile"><div class="overlay"><span class="exif-tag">F/2.2 · 1/320s</span></div></div>
+      </div>
+      <div class="portfolio-foot reveal">
+        <a href="portfolio.html" class="btn btn-primary">포트폴리오 더 보기</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 후기 / 리뷰 ===== -->
+  <section class="reviews" id="reviews">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <span class="eyebrow">REVIEW</span>
+        <h2>다녀가신 분들의 후기</h2>
+      </div>
+
+      <div class="review-track-wrap reveal">
+        <div class="review-track" id="reviewTrack">
+          <div class="review-card">
+            <div class="review-stars">★★★★★</div>
+            <p class="review-quote">자연스러운 표정을 정말 잘 끌어내주셨어요. 보정본도 과하지 않고 자연스러워서 만족스러웠습니다.</p>
+            <div class="review-author"><span class="dot"></span> 김O영 · 가족 촬영</div>
+          </div>
+          <div class="review-card">
+            <div class="review-stars">★★★★★</div>
+            <p class="review-quote">촬영 내내 편안한 분위기를 만들어주셔서 카메라 앞이 어색하지 않았어요. 결과물이 인생샷이에요.</p>
+            <div class="review-author"><span class="dot"></span> 박O준 · 커플 촬영</div>
+          </div>
+          <div class="review-card">
+            <div class="review-stars">★★★★☆</div>
+            <p class="review-quote">예약부터 촬영, 보정본 전달까지 안내가 친절하고 빨라서 좋았습니다. 다음에도 또 예약할게요.</p>
+            <div class="review-author"><span class="dot"></span> 이O아 · 프로필 촬영</div>
+          </div>
+          <div class="review-card">
+            <div class="review-stars">★★★★★</div>
+            <p class="review-quote">야외 촬영이었는데 빛 활용을 정말 잘 해주셔서 사진이 다 화보처럼 나왔어요.</p>
+            <div class="review-author"><span class="dot"></span> 정O호 · 야외 촬영</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="review-controls">
+        <button class="review-arrow" id="reviewPrev" aria-label="이전 후기">←</button>
+        <div class="review-dots" id="reviewDots"></div>
+        <button class="review-arrow" id="reviewNext" aria-label="다음 후기">→</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 인스타그램 ===== -->
+  <section class="instagram">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <span class="eyebrow">INSTAGRAM</span>
+        <h2>인스타그램에서 더 많은 사진을 만나보세요</h2>
+      </div>
+      <div class="ig-grid reveal">
+        <div class="ig-tile"><div class="ig-icon"><svg viewBox="0 0 24 24"><path d="M12 2c2.7 0 3.06.01 4.12.06 1.06.05 1.78.22 2.41.46.65.25 1.2.6 1.74 1.13.53.53.88 1.09 1.13 1.74.24.63.41 1.35.46 2.41C21.91 8.94 21.92 9.3 21.92 12s-.01 3.06-.06 4.12c-.05 1.06-.22 1.78-.46 2.41a4.7 4.7 0 0 1-1.13 1.74 4.7 4.7 0 0 1-1.74 1.13c-.63.24-1.35.41-2.41.46-1.06.05-1.42.06-4.12.06s-3.06-.01-4.12-.06c-1.06-.05-1.78-.22-2.41-.46a4.7 4.7 0 0 1-1.74-1.13 4.7 4.7 0 0 1-1.13-1.74c-.24-.63-.41-1.35-.46-2.41C2.09 15.06 2.08 14.7 2.08 12s.01-3.06.06-4.12c.05-1.06.22-1.78.46-2.41.25-.65.6-1.21 1.13-1.74A4.7 4.7 0 0 1 5.47 2.6c.63-.24 1.35-.41 2.41-.46C8.94 2.09 9.3 2.08 12 2.08V2zm0 5.35a4.65 4.65 0 1 0 0 9.3 4.65 4.65 0 0 0 0-9.3zm0 7.67a3.02 3.02 0 1 1 0-6.04 3.02 3.02 0 0 1 0 6.04zm5.9-7.85a1.08 1.08 0 1 1-2.16 0 1.08 1.08 0 0 1 2.16 0z"/></svg></div></div>
+        <div class="ig-tile"><div class="ig-icon"><svg viewBox="0 0 24 24"><path d="M12 2c2.7 0 3.06.01 4.12.06 1.06.05 1.78.22 2.41.46.65.25 1.2.6 1.74 1.13.53.53.88 1.09 1.13 1.74.24.63.41 1.35.46 2.41C21.91 8.94 21.92 9.3 21.92 12s-.01 3.06-.06 4.12c-.05 1.06-.22 1.78-.46 2.41a4.7 4.7 0 0 1-1.13 1.74 4.7 4.7 0 0 1-1.74 1.13c-.63.24-1.35.41-2.41.46-1.06.05-1.42.06-4.12.06s-3.06-.01-4.12-.06c-1.06-.05-1.78-.22-2.41-.46a4.7 4.7 0 0 1-1.74-1.13 4.7 4.7 0 0 1-1.13-1.74c-.24-.63-.41-1.35-.46-2.41C2.09 15.06 2.08 14.7 2.08 12s.01-3.06.06-4.12c.05-1.06.22-1.78.46-2.41.25-.65.6-1.21 1.13-1.74A4.7 4.7 0 0 1 5.47 2.6c.63-.24 1.35-.41 2.41-.46C8.94 2.09 9.3 2.08 12 2.08V2zm0 5.35a4.65 4.65 0 1 0 0 9.3 4.65 4.65 0 0 0 0-9.3zm0 7.67a3.02 3.02 0 1 1 0-6.04 3.02 3.02 0 0 1 0 6.04zm5.9-7.85a1.08 1.08 0 1 1-2.16 0 1.08 1.08 0 0 1 2.16 0z"/></svg></div></div>
+        <div class="ig-tile"><div class="ig-icon"><svg viewBox="0 0 24 24"><path d="M12 2c2.7 0 3.06.01 4.12.06 1.06.05 1.78.22 2.41.46.65.25 1.2.6 1.74 1.13.53.53.88 1.09 1.13 1.74.24.63.41 1.35.46 2.41C21.91 8.94 21.92 9.3 21.92 12s-.01 3.06-.06 4.12c-.05 1.06-.22 1.78-.46 2.41a4.7 4.7 0 0 1-1.13 1.74 4.7 4.7 0 0 1-1.74 1.13c-.63.24-1.35.41-2.41.46-1.06.05-1.42.06-4.12.06s-3.06-.01-4.12-.06c-1.06-.05-1.78-.22-2.41-.46a4.7 4.7 0 0 1-1.74-1.13 4.7 4.7 0 0 1-1.13-1.74c-.24-.63-.41-1.35-.46-2.41C2.09 15.06 2.08 14.7 2.08 12s.01-3.06.06-4.12c.05-1.06.22-1.78.46-2.41.25-.65.6-1.21 1.13-1.74A4.7 4.7 0 0 1 5.47 2.6c.63-.24 1.35-.41 2.41-.46C8.94 2.09 9.3 2.08 12 2.08V2zm0 5.35a4.65 4.65 0 1 0 0 9.3 4.65 4.65 0 0 0 0-9.3zm0 7.67a3.02 3.02 0 1 1 0-6.04 3.02 3.02 0 0 1 0 6.04zm5.9-7.85a1.08 1.08 0 1 1-2.16 0 1.08 1.08 0 0 1 2.16 0z"/></svg></div></div>
+        <div class="ig-tile"><div class="ig-icon"><svg viewBox="0 0 24 24"><path d="M12 2c2.7 0 3.06.01 4.12.06 1.06.05 1.78.22 2.41.46.65.25 1.2.6 1.74 1.13.53.53.88 1.09 1.13 1.74.24.63.41 1.35.46 2.41C21.91 8.94 21.92 9.3 21.92 12s-.01 3.06-.06 4.12c-.05 1.06-.22 1.78-.46 2.41a4.7 4.7 0 0 1-1.13 1.74 4.7 4.7 0 0 1-1.74 1.13c-.63.24-1.35.41-2.41.46-1.06.05-1.42.06-4.12.06s-3.06-.01-4.12-.06c-1.06-.05-1.78-.22-2.41-.46a4.7 4.7 0 0 1-1.74-1.13 4.7 4.7 0 0 1-1.13-1.74c-.24-.63-.41-1.35-.46-2.41C2.09 15.06 2.08 14.7 2.08 12s.01-3.06.06-4.12c.05-1.06.22-1.78.46-2.41.25-.65.6-1.21 1.13-1.74A4.7 4.7 0 0 1 5.47 2.6c.63-.24 1.35-.41 2.41-.46C8.94 2.09 9.3 2.08 12 2.08V2zm0 5.35a4.65 4.65 0 1 0 0 9.3 4.65 4.65 0 0 0 0-9.3zm0 7.67a3.02 3.02 0 1 1 0-6.04 3.02 3.02 0 0 1 0 6.04zm5.9-7.85a1.08 1.08 0 1 1-2.16 0 1.08 1.08 0 0 1 2.16 0z"/></svg></div></div>
+      </div>
+      <div class="portfolio-foot reveal" style="margin-top:28px;">
+        <a href="https://instagram.com" target="_blank" rel="noopener" class="btn btn-outline">인스타그램 가기 →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FAQ ===== -->
+  <section class="faq" id="faq">
+    <div class="section-head reveal" style="text-align:center;">
+      <span class="eyebrow" style="justify-content:center;">FAQ</span>
+      <h2>자주 묻는 질문</h2>
+    </div>
+
+    <div class="faq-item reveal">
+      <button class="faq-q">촬영 시간은 얼마나 걸리나요?<span class="plus"></span></button>
+      <div class="faq-a"><p>옵션에 따라 다르지만 평균 30분~1시간 정도 소요됩니다. 예약 시 옵션별 예상 시간을 안내드려요.</p></div>
+    </div>
+    <div class="faq-item reveal">
+      <button class="faq-q">보정본은 언제 받을 수 있나요?<span class="plus"></span></button>
+      <div class="faq-a"><p>촬영일로부터 평균 5~7일 내에 전달드립니다. 성수기에는 다소 늦어질 수 있어 사전에 안내드려요.</p></div>
+    </div>
+    <div class="faq-item reveal">
+      <button class="faq-q">우천 시 야외 촬영은 어떻게 되나요?<span class="plus"></span></button>
+      <div class="faq-a"><p>촬영 전날 기상 상황을 안내드리고, 일정 변경 또는 실내 촬영으로 전환할 수 있습니다.</p></div>
+    </div>
+    <div class="faq-item reveal">
+      <button class="faq-q">의상은 따로 준비해야 하나요?<span class="plus"></span></button>
+      <div class="faq-a"><p>원하는 의상으로 자유롭게 준비하시면 됩니다. 컨셉에 맞는 의상 추천이 필요하면 예약 시 요청사항에 남겨주세요.</p></div>
+    </div>
+    <div class="faq-item reveal">
+      <button class="faq-q">예약 취소·변경은 어떻게 하나요?<span class="plus"></span></button>
+      <div class="faq-a"><p>촬영일 기준 3일 전까지는 별도 비용 없이 변경 및 취소가 가능합니다. 이후에는 별도 안내를 드려요.</p></div>
+    </div>
+  </section>
+
+  <!-- ===== 최종 CTA ===== -->
+  <section class="final-cta">
+    <div class="wrap">
+      <span class="exif-tag">F/2.8 · 1/250s · ISO 100 · 35mm</span>
+      <h2>지금, 오늘의 순간을 예약하세요</h2>
+      <p>원하는 날짜와 시간을 선택하고 빠르게 예약을 완료해보세요.</p>
+      <a href="reservation.html" class="btn btn-primary">예약하기</a>
+    </div>
+  </section>
+
+  <!-- ===== 푸터 ===== -->
+  <footer class="site-footer">
+    <div class="wrap">
+      <div class="footer-grid">
+        <div>
+          <div class="footer-logo">사진관 이름</div>
+          <p>빛이 머무는 자리,<br>오늘의 순간을 기록합니다.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Menu</h4>
+          <ul>
+            <li><a href="about.html">작가소개</a></li>
+            <li><a href="portfolio.html">포트폴리오</a></li>
+            <li><a href="pricing.html">요금안내</a></li>
+            <li><a href="reservation.html">예약하기</a></li>
+            <li><a href="community.html">커뮤니티</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Contact</h4>
+          <ul>
+            <li><a href="tel:010-0000-0000">010-0000-0000</a></li>
+            <li><a href="mailto:studio@email.com">studio@email.com</a></li>
+            <li>서울시 OO구 OO로 00</li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Social</h4>
+          <ul>
+            <li><a href="https://instagram.com" target="_blank" rel="noopener">Instagram</a></li>
+            <li><a href="#">카카오톡 채널</a></li>
+            <li><a href="community.html">커뮤니티</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>사업자명 OOO · 대표 OOO · 사업자등록번호 000-00-00000</span>
+        <span>© 2026 사진관 이름. All rights reserved.</span>
+      </div>
+    </div>
+  </footer>
+
+<script>
+(function () {
+  // ====== 헤더: 스크롤 시 배경 전환 ======
+  const header = document.getElementById('siteHeader');
+  function onScroll() {
+    if (window.scrollY > 40) header.classList.add('is-scrolled');
+    else header.classList.remove('is-scrolled');
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  // ====== 모바일 메뉴 토글 ======
+  const navToggle = document.getElementById('navToggle');
+  const navList = document.getElementById('navList');
+  navToggle.addEventListener('click', function () {
+    document.body.classList.toggle('nav-open');
+  });
+  navList.querySelectorAll('a').forEach(function (link) {
+    link.addEventListener('click', function () {
+      document.body.classList.remove('nav-open');
+    });
+  });
+
+  // ====== 스크롤 reveal ======
+  const revealEls = document.querySelectorAll('.reveal');
+  if ('IntersectionObserver' in window) {
+    const observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15 });
+    revealEls.forEach(function (el) { observer.observe(el); });
+  } else {
+    revealEls.forEach(function (el) { el.classList.add('is-visible'); });
+  }
+
+  // ====== 후기 캐러셀 ======
+  const track = document.getElementById('reviewTrack');
+  const cards = track.querySelectorAll('.review-card');
+  const dotsWrap = document.getElementById('reviewDots');
+  const prevBtn = document.getElementById('reviewPrev');
+  const nextBtn = document.getElementById('reviewNext');
+
+  function getPerView() {
+    return window.innerWidth <= 900 ? 1 : 3;
+  }
+
+  let perView = getPerView();
+  let maxIndex = Math.max(0, cards.length - perView);
+  let current = 0;
+
+  function buildDots() {
+    dotsWrap.innerHTML = '';
+    for (let i = 0; i <= maxIndex; i++) {
+      const dot = document.createElement('span');
+      dot.className = 'review-dot' + (i === current ? ' is-active' : '');
+      dot.addEventListener('click', function () { goTo(i); });
+      dotsWrap.appendChild(dot);
+    }
+  }
+
+  function update() {
+    const cardWidth = cards[0].getBoundingClientRect().width;
+    const gap = 20;
+    track.style.transform = 'translateX(' + (-(cardWidth + gap) * current) + 'px)';
+    dotsWrap.querySelectorAll('.review-dot').forEach(function (d, i) {
+      d.classList.toggle('is-active', i === current);
+    });
+  }
+
+  function goTo(index) {
+    current = Math.max(0, Math.min(maxIndex, index));
+    update();
+  }
+
+  prevBtn.addEventListener('click', function () { goTo(current - 1); });
+  nextBtn.addEventListener('click', function () { goTo(current + 1); });
+
+  // 터치 스와이프
+  let touchStartX = 0;
+  track.addEventListener('touchstart', function (e) { touchStartX = e.touches[0].clientX; }, { passive: true });
+  track.addEventListener('touchend', function (e) {
+    const diff = e.changedTouches[0].clientX - touchStartX;
+    if (diff > 50) goTo(current - 1);
+    if (diff < -50) goTo(current + 1);
+  }, { passive: true });
+
+  window.addEventListener('resize', function () {
+    perView = getPerView();
+    maxIndex = Math.max(0, cards.length - perView);
+    current = Math.min(current, maxIndex);
+    buildDots();
+    update();
+  });
+
+  buildDots();
+  update();
+
+  // ====== FAQ 아코디언 ======
+  document.querySelectorAll('.faq-item').forEach(function (item) {
+    const q = item.querySelector('.faq-q');
+    const a = item.querySelector('.faq-a');
+    q.addEventListener('click', function () {
+      const isOpen = item.classList.contains('is-open');
+      document.querySelectorAll('.faq-item').forEach(function (el) {
+        el.classList.remove('is-open');
+        el.querySelector('.faq-a').style.maxHeight = null;
+      });
+      if (!isOpen) {
+        item.classList.add('is-open');
+        a.style.maxHeight = a.scrollHeight + 'px';
+      }
+    });
+  });
+})();
+</script>
+
+</body>
+</html>
